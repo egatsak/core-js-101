@@ -94,8 +94,45 @@ function getFastestPromise(array) {
  *    });
  *
  */
-function chainPromises(array, action) {
-  return Promise.allSettled(array).then(action);
+async function chainPromises(array, action) {
+  // eslint-disable-next-line no-unused-vars
+  async function findFirstGoodBoy(arr) {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const item of arr) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await item;
+        return item;
+      } catch (e) {
+        e.message += `${1}`;
+      }
+    }
+    return 'Fuck';
+  }
+
+  const result = array
+    .reduce(
+      (p, f, i) => p
+        .then(async (prev) => {
+          if (prev === undefined) {
+            throw new Error();
+          }
+          let res;
+          try {
+            res = await f;
+            if (res === undefined) {
+              throw new Error();
+            }
+            return action(prev, res);
+          } catch (e) {
+            e.message += `${i}`;
+          }
+          return prev;
+        }),
+      Promise.resolve(''),
+    )
+    .then((res) => (typeof res === 'string' ? res.trim() : res));
+  return result;
 }
 
 module.exports = {

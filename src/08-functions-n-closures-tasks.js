@@ -83,7 +83,7 @@ function memoize(func) {
   return (...args) => {
     if (isInvoked) return result;
     isInvoked = true;
-    result = func.call(null, ...args);
+    result = func(...args);
     return result;
   };
 }
@@ -103,8 +103,19 @@ function memoize(func) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  let att = 0;
+  return (...args) => {
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        const res = func(...args);
+        return res;
+      } catch (e) {
+        att += 1;
+      }
+    }
+    return att;
+  };
 }
 
 /**

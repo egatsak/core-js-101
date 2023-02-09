@@ -51,7 +51,8 @@ function getJSON(obj) {
  *
  */
 function fromJSON(proto, json) {
-  return Object.assign(JSON.parse(json), proto);
+  const obj = Object.create(proto);
+  return Object.assign(obj, JSON.parse(json));
 }
 
 /**
@@ -109,32 +110,69 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  output: '',
+
+  stringify() {
+    return this.output;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    this.error(1);
+    const obj = Object.create(cssSelectorBuilder);
+    obj.ind = 1;
+    obj.output = this.output + value;
+    return obj;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.error(2);
+    const obj = Object.create(cssSelectorBuilder);
+    obj.ind = 2;
+    obj.output = `${this.output}#${value}`;
+    return obj;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.error(3);
+    const obj = Object.create(cssSelectorBuilder);
+    obj.ind = 3;
+    obj.output = `${this.output}.${value}`;
+    return obj;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.error(4);
+    const obj = Object.create(cssSelectorBuilder);
+    obj.ind = 4;
+    obj.output = `${this.output}[${value}]`;
+    return obj;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.error(5);
+    const obj = Object.create(cssSelectorBuilder);
+    obj.ind = 5;
+    obj.output = `${this.output}:${value}`;
+    return obj;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.error(6);
+    const obj = Object.create(cssSelectorBuilder);
+    obj.ind = 6;
+    obj.output = `${this.output}::${value}`;
+    return obj;
+  },
+
+  combine(selector1, combinator, selector2) {
+    const obj = Object.create(cssSelectorBuilder);
+    obj.output = `${selector1.output} ${combinator} ${selector2.output}`;
+    return obj;
+  },
+
+  error(newInd) {
+    if (this.ind > newInd) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    if (this.ind === newInd && (newInd === 1 || newInd === 2 || newInd === 6)) throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
   },
 };
 
