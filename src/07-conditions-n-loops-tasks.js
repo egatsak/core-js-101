@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable consistent-return */
 /* *************************************************************************************************
  *                                                                                                *
  * Please read the following tutorial before implementing tasks:                                   *
@@ -128,8 +130,25 @@ function isTriangle(a, b, c) {
  *   { top:20, left:20, width: 20, height: 20 }    =>  false
  *
  */
-function doRectanglesOverlap(/* rect1, rect2 */) {
-  throw new Error('Not implemented');
+function doRectanglesOverlap(rect1, rect2) {
+  const ax1 = rect1.left + rect1.width;
+  const bx1 = rect2.left + rect2.width;
+  const ay1 = rect1.top + rect1.height;
+  const by1 = rect2.top + rect2.height;
+
+  const cx0 = rect1.left < rect2.left ? rect2.left : rect1.left;
+  const cx1 = ax1 < bx1 ? ax1 : bx1;
+
+  if (cx1 - cx0 >= 0) {
+    const cy0 = rect1.top < rect2.top ? rect2.top : rect1.top;
+    const cy1 = ay1 < by1 ? ay1 : by1;
+
+    if (cy1 - cy0 >= 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -270,8 +289,25 @@ function reverseInteger(num) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  let sum = 0;
+  const digits = `${ccn}`
+    .split('')
+    .reverse()
+    .map((item) => Number(item));
+
+  for (let i = 0; i < digits.length; i += 1) {
+    let digit = digits[i];
+    if (i % 2) {
+      digit *= 2;
+    }
+    if (digit > 9) {
+      digit -= 9;
+    }
+    sum += digit;
+  }
+
+  return sum % 10 === 0;
 }
 
 /**
@@ -456,8 +492,36 @@ function getMatrixProduct(m1, m2) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  let result;
+  for (let i = 0; i < 3; i += 1) {
+    if ((position[i][0]) && (position[i][0] === position[i][1])
+                    && (position[i][1] === position[i][2])) {
+      result = position[i][0];
+      return result;
+    }
+    if ((position[0][i]) && (position[0][i] === position[1][i])
+                    && (position[1][i] === position[2][i])) {
+      result = position[0][i];
+      return result;
+    }
+  }
+
+  if (
+    position[1][1] !== 0
+    && position[0][0] === position[1][1]
+    && position[1][1] === position[2][2]
+  ) {
+    return position[1][1];
+  }
+  if (
+    position[1][1]
+    && position[0][2] === position[1][1]
+    && position[1][1] === position[2][0]
+  ) {
+    return position[1][1];
+  }
+  return result;
 }
 
 module.exports = {
